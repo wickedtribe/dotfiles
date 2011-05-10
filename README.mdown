@@ -1,0 +1,6 @@
+# My personal dotfiles
+
+These are my dotfiles. Some of these scripts can be used on any *nix
+system and others are for configuring my machine specifically.
+
+Changes are frequent and this will not be a stable environment.
