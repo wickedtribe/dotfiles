@@ -1,0 +1,29 @@
+#!/bin/sh
+
+EHCI_BUSES="0000:00:1a.0 0000:00:1d.0"
+XHCI_BUSES="0000:04:00.0"
+
+case "${1}" in
+    hibernate|suspend)
+        # Switch USB buses off
+        for bus in $EHCI_BUSES; do
+            echo -n $bus | tee /sys/bus/pci/drivers/ehci_hcd/unbind
+        done
+        for bus in $XHCI_BUSES; do
+            echo -n $bus | tee /sys/bus/pci/drivers/xhci_hcd/unbind
+        done
+        # Switch nvidia card on before going to sleep, avoids the "constant on"
+        # bug that occurs after 2 suspend/resume cycles (thanks kos888)
+        #echo '\_SB.PCI0.PEG1.GFX0._ON' > /proc/acpi/call
+        ;;
+    resume|thaw)
+        # Switch USB buses back on and nvidia card off
+        for bus in $EHCI_BUSES; do
+            echo -n $bus | tee /sys/bus/pci/drivers/ehci_hcd/bind
+        done
+        for bus in $XHCI_BUSES; do
+            echo -n $bus | tee /sys/bus/pci/drivers/xhci_hcd/bind
+        done
+        #echo '\_SB.PCI0.PEG1.GFX0._OFF' > /proc/acpi/call
+        ;;
+esac
